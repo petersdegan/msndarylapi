@@ -35,6 +35,31 @@ router.get('/:id', async (req, res) => {
         res.status(500).json({ message: error.message });
     }
 });
+// Récupérer toutes les annonces avec possibilité de filtrer par titre, description ou catégorie
+router.get('/', async (req, res) => {
+    try {
+        const { titre, description, category } = req.query;
+        
+        // Construire le filtre basé sur les paramètres de requête
+        let filter = {};
+        if (titre) {
+            filter.titre = { $regex: new RegExp(titre, 'i') }; // 'i' pour une recherche insensible à la casse
+        }
+        if (description) {
+            filter.description = { $regex: new RegExp(description, 'i') };
+        }
+        if (category) {
+            filter.category = category;
+        }
+
+        // Trouver les annonces avec le filtre
+        const annonces = await Annonce.find(filter).populate('author', 'name email');
+        res.json(annonces);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+});
+
 
 // Mettre à jour une annonce
 router.put('/:id', async (req, res) => {

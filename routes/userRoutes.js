@@ -3,6 +3,11 @@ const express = require('express');
 const router = express.Router();
 const User = require('../models/user');
 
+const JWT_SECRET = process.env.JWT_SECRET || 'votre_clé_secrète'; 
+const jwt = require('jsonwebtoken');
+
+
+
 // Créer un nouvel utilisateur
 router.post('/register', async (req, res) => {
     try {
@@ -31,8 +36,15 @@ router.post('/login', async (req, res) => {
             return res.status(400).json({ message: 'Email ou mot de passe incorrect.' });
         }
 
-        // Générer un token ici si nécessaire (JWT par exemple)
-        res.json({ message: 'Connexion réussie', user });
+        // Générer un token JWT
+        const token = jwt.sign(
+            { userId: user._id, email: user.email },
+            JWT_SECRET,
+            { expiresIn: '24h' } // Le token expire après 24h heure, ajustez selon vos besoins
+        );
+
+        // Répondre avec le token et les informations de l'utilisateur
+        res.json({ message: 'Connexion réussie', token, user });
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
