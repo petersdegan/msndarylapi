@@ -3,7 +3,8 @@ const express = require('express');
 const mongoose = require('mongoose');
 const dotenv = require('dotenv');
 const cors = require('cors');
-
+const morgan = require('morgan')
+const helmet = require('helmet')
 
 
 
@@ -14,6 +15,8 @@ dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 5000;
 
+app.use(morgan('dev'))
+app.use(helmet())
 app.use(cors()); // Autorise toutes les origines par défaut
 app.use(express.json()); // Permet de parser les requêtes JSON
 
